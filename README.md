@@ -8,21 +8,21 @@ We modified the loss function of the original SinSR to improve the performance o
 ## Modifications
 The original SinSR uses the following loss function:
 
-$$
+```math
 \mathcal{L} = \mathcal{L}_{\text{distill}} + \mathcal{L}_{\text{reverse}} + \mathcal{L}_{\text{gt}}
-$$
+```
 
 We modified the loss function as follows:
 
-$$
+```math
 \mathcal{L} = \mathcal{L}_{\text{distill}} + \mathcal{L}_{\text{reverse}} + \mathcal{L}_{\text{gt}} + \mathcal{L}_{\text{crop-gt-distill}} + \mathcal{L}_{\text{crop-gt-reverse}} + \mathcal{L}_{\text{crop-gt}}
-$$
+```
 
 where  
-$\text{crop-gt}$: is the crop of the ground truth image  
-$\mathcal{L}_{\text{distill}}$: is similar to the original distillation loss, changing the input to the crop of the ground truth image  
-$\mathcal{L}_{\text{reverse}}$: is similar to the original reverse loss, changing the input to the crop of the ground truth image  
-$\mathcal{L}_{\text{crop-gt}}$: is the loss difference between the crop of the ground truth image and the image up-scaled and down-scaled by the model
+$`\text{crop-gt}`$: is the crop of the ground truth image  
+$`\mathcal{L}_{\text{distill}}`$: is similar to the original distillation loss, changing the input to the crop of the ground truth image  
+$`\mathcal{L}_{\text{reverse}}`$: is similar to the original reverse loss, changing the input to the crop of the ground truth image  
+$`\mathcal{L}_{\text{crop-gt}}`$: is the loss difference between the crop of the ground truth image and the image up-scaled and down-scaled by the model
 
 
 ## Requirements
