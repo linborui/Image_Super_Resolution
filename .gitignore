@@ -172,7 +172,7 @@ saved/
 weights/
 
 # results path
-results/
+# results/
 
 # large test data
 testdata/
