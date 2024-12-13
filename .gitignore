@@ -167,3 +167,9 @@ saved/
 
 # model path
 weights/
+
+# results path
+results/
+
+# large test data
+testdata/

@@ -61,7 +61,7 @@ class RealESRGANDataset(data.Dataset):
         if 'dir_paths' in opt:
             for current_dir in opt['dir_paths']:
                 for current_ext in opt['im_exts']:
-                    self.paths.extend(sorted([str(x) for x in Path(current_dir).glob(f'**/*.{current_ext}')]))
+                    self.paths.extend(sorted([str(x) for x in Path(current_dir).glob(f'*.{current_ext}')]))
         if 'txt_file_path' in opt:
             for current_txt in opt['txt_file_path']:
                 self.paths.extend(readline_txt(current_txt))

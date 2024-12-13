@@ -1209,7 +1209,8 @@ class TrainerDistillDifIR(TrainerDifIR):
                     model_kwargs=model_kwargs,
                     progress=False,
                     one_step=True
-                    ) 
+                    )
+                results = results.clamp(-1, 1)
                 
                 if 'gt' in data:
                     mean_psnr += util_image.batch_PSNR(
@@ -1219,6 +1220,7 @@ class TrainerDistillDifIR(TrainerDifIR):
                             )
                     mean_lpips += self.lpips_loss(results.detach(), im_gt).sum().item()
                 with torch.no_grad():
+                    results_norm = results.detach() - results.detach().min()
                     mean_clipiqa += self.metric_dict["clipiqa"](results.detach() * 0.5 + 0.5).sum().item()
                     mean_musiq += self.metric_dict["musiq"](results.detach() * 0.5 + 0.5).sum().item()
                 if (ii + 1) % self.configs.train.log_freq[2] == 0:
@@ -1308,7 +1310,7 @@ class TrainerSSupDistillDifIR(TrainerDistillDifIR):
             micro_gt_crop = micro_data["gt"][..., crop_top:crop_top+h_lq, crop_left:crop_left+w_lq]
             model_kwargs_up={'lq':micro_gt_crop,} if self.configs.model.params.cond_lq else None
 
-            compute_losses_downsample = functools.partial(
+            compute_losses_downscale = functools.partial(
                 self.base_diffusion.training_losses_distill,
                 self.model,
                 self.teacher_model,
@@ -1328,7 +1330,7 @@ class TrainerSSupDistillDifIR(TrainerDistillDifIR):
                 loss_in_image_space=self.loss_in_image_space
             )
 
-            compute_losses_upsample = functools.partial(
+            compute_losses_upscale = functools.partial(
                 self.base_diffusion.training_losses_distill_up,
                 self.model,
                 self.teacher_model,
@@ -1343,7 +1345,7 @@ class TrainerSSupDistillDifIR(TrainerDistillDifIR):
                 loss_in_image_space=self.loss_in_image_space
             )
 
-            losses_func = {'up': compute_losses_upsample, 'down': compute_losses_downsample}
+            losses_func = {'up': compute_losses_upscale, 'down': compute_losses_downscale}
             losses_all = {}
 
             for func_type in losses_func:

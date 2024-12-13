@@ -34,9 +34,6 @@ def main():
             )
     args = parser.parse_args()
 
-    img_list = sorted([x for x in Path(args.indir).glob('**/*.JPEG')])
-    print(f'Number of images in imagenet validation dataset: {len(img_list)}')
-
     random.seed(10000)
     random.shuffle(img_list)
 
@@ -47,9 +44,15 @@ def main():
     if not lq_dir.exists():
         lq_dir.mkdir(parents=True)
 
-    num_imgs = 3000
+    num_imgs = 5000
     configs = OmegaConf.load('./configs/degradation_testing_realesrgan.yaml')
     opts, opts_degradation = configs.opts, configs.degradation
+
+    img_list = []
+    for ext in opts['im_exts']:
+        img_list += list(Path(args.indir).glob(f'*.{ext}'))
+    print(f'Number of images in imagenet validation dataset: {len(img_list)}')
+
     opts['dir_paths'] = [args.indir, ]
     opts['length'] = num_imgs
     dataset = RealESRGANDataset(opts, mode='testing')
@@ -68,7 +71,8 @@ def main():
         im_lq, im_gt = data_dict2['lq'], data_dict2['gt']
         im_lq, im_gt = util_image.tensor2img([im_lq, im_gt], rgb2bgr=True, min_max=(0,1) ) # uint8
 
-        im_name = Path(data_dict1['gt_path']).stem
+        im_path = Path(data_dict1['gt_path'])
+        im_name = f'{im_path.stem}'
         im_path_gt = gt_dir / f'{im_name}.png'
         util_image.imwrite(im_gt, im_path_gt, chn='bgr', dtype_in='uint8')
 

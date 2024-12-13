@@ -31,7 +31,7 @@ def get_parser(**parser_kwargs):
             "--task",
             type=str,
             default="SinSR",
-            choices=["SinSR",'realsrx4', 'bicsrx4_opencv', 'bicsrx4_matlab'],
+            choices=["SinSR", 'realsrx4', 'bicsrx4_opencv', 'bicsrx4_matlab', 'SinSR_Dual'],
             help="Chopping forward.",
             )
     parser.add_argument("--ddim", action="store_true")
@@ -46,6 +46,8 @@ def get_configs(args):
     if args.config is None:
         if args.task == "SinSR":
             configs = OmegaConf.load('./configs/SinSR.yaml')
+        elif args.task == 'SinSR_Dual':
+            configs = OmegaConf.load('./configs/SinSR_Dual.yaml')
         elif args.task == 'realsrx4':
             configs = OmegaConf.load('./configs/realsr_swinunet_realesrgan256.yaml')
     else:
@@ -57,6 +59,8 @@ def get_configs(args):
             ckpt_dir.mkdir()
         if args.task == "SinSR":
             ckpt_path = ckpt_dir / f'SinSR_v1.pth'
+        elif args.task == 'SinSR_Dual':
+            ckpt_path = ckpt_dir / f'SinSR_Dual_v1.pth'
         elif args.task == 'realsrx4':
             ckpt_path = ckpt_dir / f'resshift_{args.task}_s{args.steps}_v1.pth'
     else:
@@ -71,13 +75,23 @@ def get_configs(args):
                 progress=True,
                 file_name=ckpt_path.name,
                 )
-        else:
+        elif args.task == 'SinSR_Dual':
+            load_file_from_url(
+                url=f"https://github.com/linborui/Image_Super_Resolution/releases/download/v0.1/{ckpt_path.name}.pth",
+                model_dir=ckpt_dir,
+                progress=True,
+                file_name=ckpt_path.name,
+                )
+        elif args.task == 'realsrx4':
             load_file_from_url(
                 url=f"https://github.com/zsyOAOA/ResShift/releases/download/v2.0/{ckpt_path.name}",
                 model_dir=ckpt_dir,
                 progress=True,
                 file_name=ckpt_path.name,
                 )
+        else:
+            raise ValueError("Unknown task")
+
     vqgan_path = ckpt_dir / f'autoencoder_vq_f4.pth'
     if not vqgan_path.exists():
          load_file_from_url(
@@ -101,7 +115,7 @@ def get_configs(args):
     elif args.chop_size == 256:
         chop_stride = 224
     else:
-        raise ValueError("Chop size must be in [512, 384, 256]")
+        raise ValueError("Chop size must be in [512, 256]")
 
     return configs, chop_stride
 
@@ -124,6 +138,6 @@ def main():
     import evaluate
     evaluate.evaluate(args.out_path, args.ref_path, None)
     
-    
+
 if __name__ == '__main__':
     main()
