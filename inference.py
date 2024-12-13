@@ -46,10 +46,12 @@ def get_configs(args):
     if args.config is None:
         if args.task == "SinSR":
             configs = OmegaConf.load('./configs/SinSR.yaml')
-        elif args.task == 'SinSR_Dual':
-            configs = OmegaConf.load('./configs/SinSR_Dual.yaml')
         elif args.task == 'realsrx4':
             configs = OmegaConf.load('./configs/realsr_swinunet_realesrgan256.yaml')
+        elif args.task == 'SinSR_Dual':
+            configs = OmegaConf.load('./configs/SinSR_Dual.yaml')
+        elif args.task == "SinSR_retrain":
+            configs = OmegaConf.load('./configs/SinSR_retrain.yaml')
     else:
         configs = OmegaConf.load(args.config)
     # prepare the checkpoint
@@ -59,10 +61,12 @@ def get_configs(args):
             ckpt_dir.mkdir()
         if args.task == "SinSR":
             ckpt_path = ckpt_dir / f'SinSR_v1.pth'
-        elif args.task == 'SinSR_Dual':
-            ckpt_path = ckpt_dir / f'SinSR_Dual_v1.pth'
         elif args.task == 'realsrx4':
             ckpt_path = ckpt_dir / f'resshift_{args.task}_s{args.steps}_v1.pth'
+        elif args.task == 'SinSR_Dual':
+            ckpt_path = ckpt_dir / f'SinSR_Dual_v1.pth'
+        elif args.task == "SinSR_retrain":
+            ckpt_path = ckpt_dir / f'SinSR_retrain_v1.pth'
     else:
         ckpt_path = Path(args.ckpt)
     print(f"[INFO] Using the checkpoint {ckpt_path}")
@@ -75,16 +79,23 @@ def get_configs(args):
                 progress=True,
                 file_name=ckpt_path.name,
                 )
-        elif args.task == 'SinSR_Dual':
+        elif args.task == 'realsrx4':
             load_file_from_url(
-                url=f"https://github.com/linborui/Image_Super_Resolution/releases/download/v0.1/{ckpt_path.name}.pth",
+                url=f"https://github.com/zsyOAOA/ResShift/releases/download/v2.0/{ckpt_path.name}",
                 model_dir=ckpt_dir,
                 progress=True,
                 file_name=ckpt_path.name,
                 )
-        elif args.task == 'realsrx4':
+        elif args.task == 'SinSR_Dual':
             load_file_from_url(
-                url=f"https://github.com/zsyOAOA/ResShift/releases/download/v2.0/{ckpt_path.name}",
+                url=f"https://github.com/linborui/Image_Super_Resolution/releases/download/v0.1/{ckpt_path.name}",
+                model_dir=ckpt_dir,
+                progress=True,
+                file_name=ckpt_path.name,
+                )
+        elif args.task == "SinSR_retrain":
+            load_file_from_url(
+                url=f"https://github.com/linborui/Image_Super_Resolution/releases/download/v0.1/{ckpt_path.name}",
                 model_dir=ckpt_dir,
                 progress=True,
                 file_name=ckpt_path.name,

@@ -29,6 +29,11 @@ def get_configs(model, colab):
             configs = OmegaConf.load('/content/SinSR/configs/SinSR_Dual.yaml')
         else:
             configs = OmegaConf.load('./configs/SinSR_Dual.yaml')
+    elif model == 'SinSR_retrain':
+        if colab:
+            configs = OmegaConf.load('/content/SinSR/configs/SinSR.yaml')
+        else:
+            configs = OmegaConf.load('./configs/SinSR.yaml')
 
     # prepare the checkpoint
     ckpt_dir = Path('./weights')
@@ -56,7 +61,16 @@ def get_configs(model, colab):
         ckpt_path = ckpt_dir / f'SinSR_Dual_v1.pth'
         if not ckpt_path.exists():
             load_file_from_url(
-                url=f"https://github.com/linborui/Image_Super_Resolution/releases/download/v0.1/{ckpt_path.name}.pth",
+                url=f"https://github.com/linborui/Image_Super_Resolution/releases/download/v0.1/{ckpt_path.name}",
+                model_dir=ckpt_dir,
+                progress=True,
+                file_name=ckpt_path.name,
+                )
+    elif model == "SinSR_retrain":
+        ckpt_path = ckpt_dir / f'SinSR_retrain_v1.pth'
+        if not ckpt_path.exists():
+            load_file_from_url(
+                url=f"https://github.com/linborui/Image_Super_Resolution/releases/download/v0.1/{ckpt_path.name}",
                 model_dir=ckpt_dir,
                 progress=True,
                 file_name=ckpt_path.name,
@@ -97,6 +111,7 @@ def predict(in_path, single_step, colab = True, model='SinSR', seed=12345):
     
     if model=="SinSR": single_step = True
     if model=="SinSR_Dual": single_step = True
+    if model=="SinSR_retrain": single_step = True
     sampler.inference(in_path, out_dir, bs=1, noise_repeat=False, one_step=single_step)
 
     out_path = out_dir / f"{Path(in_path).stem}.png"
@@ -112,7 +127,7 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    sampler_dict = {"SinSR_Dual": None, "SinSR": None, "ResShift": None} 
+    sampler_dict = {"SinSR_Dual": None, "SinSR_retrain": None, "SinSR": None, "ResShift": None} 
 
     title = "SinSR Dual Scale"
     description = r"""
@@ -144,8 +159,8 @@ if __name__ == "__main__":
             gr.Checkbox(label="Single diffusion step", value=True),
             gr.Checkbox(label="Using colab?", value = args.colab),
             gr.Dropdown(
-                choices=["SinSR_Dual", "SinSR", "ResShift"],
-                value="SinSR",
+                choices=["SinSR_Dual", "SinSR_retrain", "SinSR", "ResShift"],
+                value="SinSR_Dual",
                 label="Model",
                 ),
             gr.Number(value=12345, precision=0, label="Random seed")
