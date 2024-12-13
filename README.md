@@ -1,6 +1,6 @@
 # SinSR Dual Scale
 
-This project is a variasion of [SinSR: Diffusion-Based Image Super-Resolution in a Single Step](https://github.com/wyf0912/SinSR).  
+This project is a variation of [SinSR: Diffusion-Based Image Super-Resolution in a Single Step](https://github.com/wyf0912/SinSR).  
 If you want to know more about SinSR, please refer to the original repository.
 
 We modified the loss function of the original SinSR to improve the performance of the model.
